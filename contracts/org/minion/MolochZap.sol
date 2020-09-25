@@ -222,7 +222,7 @@ contract MolochZap is Ownable {
     using SafeMath for uint256;
     address public moloch;
     address public constant wETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // canonical ether token wrapper contract reference for proposals
-    string public constant MINION_ACTION_DETAILS = '{"isMinion": true, "kind": "zap", "title":"NEW MEMBER", "ipfs":"';
+    string public constant MINION_ACTION_DETAILS = '{"isMinion": true, "kind": "zap", "title":"NEW MEMBER", "description":"';
     uint256 public zapCount;
     uint256 public zapRate;
 
