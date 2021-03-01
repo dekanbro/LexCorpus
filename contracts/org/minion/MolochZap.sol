@@ -222,6 +222,7 @@ contract MolochZap is Ownable {
     using SafeMath for uint256;
     address public moloch;
     address public constant wETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // canonical ether token wrapper contract reference for proposals
+    string public constant MINION_ACTION_DETAILS = '{"isMinion": true, "kind": "zap", "title":"NEW MEMBER", "description":"';
     uint256 public zapCount;
     uint256 public zapRate;
 
@@ -242,31 +243,48 @@ contract MolochZap is Ownable {
     }
 
     function() payable external {
-        uint256 sharesRequested = msg.value.mul(zapRate); 
+        
         
         IWETH(wETH).deposit();
         (bool success, ) = wETH.call.value(msg.value)("");
         require(success, "!transfer");
         IWETH(wETH).transfer(address(this), msg.value);
         
-        zapCount = zapCount + 1;
+        propose(_msgSender(), "MOLOCH ZAP");
+        
+
+    }
+    
+    function propose(
+        address _applicant,
+        string memory _description
+    )
+        public
+        payable
+        returns (uint256)
+    {
+       string memory details = string(abi.encodePacked(MINION_ACTION_DETAILS, _description, '"}'));
+       uint256 sharesRequested = msg.value.mul(zapRate); 
+       zapCount = zapCount + 1;
 
         IMoloch(moloch).submitProposal(
-            _msgSender(),
+            _applicant,
             sharesRequested,
             0,
             msg.value,
             wETH,
             0,
             wETH,
-            "MOLOCH_ZAP"
+            details
         );
         
         zaps[zapCount] = Zap(
-            _msgSender(),
+            _applicant,
             msg.value);
 
-        emit ProposeZap(_msgSender(), zapCount);
+        emit ProposeZap(_applicant, zapCount);
+        
+        
     }
     
     function updateZapRate(uint256 _zapRate) external onlyOwner {
